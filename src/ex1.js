@@ -6,4 +6,9 @@ const ans = input.split('\n')
     .map(Number)
     .reduce((t,c,i,a) => c > a[i-1] ? ++t : t,0);
 
-console.log(ans);
+const ans2 = input.split('\n')
+    .filter(x => x.length > 0)
+    .map(Number)
+    .reduce((t,c,i,a) => (a[i] + a[i+1] + a[i+2])  > ( a[i-1] + a[i] + a[i+1]) ? ++t : t,0);
+    
+console.log(ans, ans2);
