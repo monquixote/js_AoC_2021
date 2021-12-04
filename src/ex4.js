@@ -16,15 +16,15 @@ const numRows = rows
 
 function extractCards(procRows) {
     const cards = [];
-    while(procRows.length > 0) {
-        const workingRows = procRows.splice(0,5);
+    while (procRows.length > 0) {
+        const workingRows = procRows.splice(0, 5);
 
         cards.push(workingRows);
     }
     return cards;
 }
 
-const transpose = m => m[0].map((x,i) => m.map(x => x[i]))
+const transpose = m => m[0].map((x, i) => m.map(x => x[i]))
 
 function isWinningCard(card, ans) {
     return [...card, ...transpose(card)]
@@ -33,51 +33,40 @@ function isWinningCard(card, ans) {
 
 const cards = extractCards(numRows)
 
-const curMoves = []
-const moves1 = [...moves]
-while(true) {
-    curMoves.push(moves1.shift())
-    const winner = cards.find(x => isWinningCard(x, curMoves));
-    if(winner) {
-        const remainingSum = winner
-            .flat()
-            .filter(x => !curMoves.includes(x))
-            .reduce((p,c) => p+c);
+function calcScore(board, moves) {
+    return board
+        .flat()
+        .filter(x => !moves.includes(x))
+        .reduce((p, c) => p + c);
+}
 
-        const finalMove = curMoves.pop();
-        console.log('WINNER!',remainingSum * finalMove);
-        break;
-    }
-    if(moves1.length === 0) {
-        console.log('FAIL')
-        break;
+function ex1(cards, moves) {
+    const curMoves = []
+    for (const e of moves) {
+        curMoves.push(e)
+        const winner = cards.find(x => isWinningCard(x, curMoves));
+        if (winner) {
+            return calcScore(winner, curMoves) * e;
+        }
     }
 }
+
+console.log('EX1: ', ex1(cards, moves));
 
 // Ex2
-let cardsInPlay = cards;
-const curMoves2 = []
-const moves2 = [...moves]
-let winner = null;
-while(true) {
-    curMoves2.push(moves2.shift())
-    cardsInPlay = cardsInPlay.filter(x => !isWinningCard(x,curMoves2));
-    if(cardsInPlay.length === 1) {
-        winner = cardsInPlay[0];
-    }
-    if(cardsInPlay.length === 0) {
-
-        const remainingSum = winner
-            .flat()
-            .filter(x => !curMoves2.includes(x))
-            .reduce((p,c) => p+c);
-
-        const finalMove = curMoves2.pop();
-        console.log('WINNER2!', remainingSum * finalMove);
-        break;
-    }
-    if(moves2.length === 0) {
-        console.log('FAIL')
-        break;
+function ex2(cards, moves) {
+    const curMoves2 = []
+    let winner = null;
+    for(const e of moves) {
+        curMoves2.push(e)
+        cards = cards.filter(x => !isWinningCard(x, curMoves2));
+        if (cards.length === 1) {
+            winner = cards[0];
+        }
+        if (cards.length === 0) {
+            return  calcScore(winner, curMoves2) * e;
+        }
     }
 }
+
+console.log('EX2: ', ex2(cards, moves));
