@@ -34,8 +34,9 @@ function isWinningCard(card, ans) {
 const cards = extractCards(numRows)
 
 const curMoves = []
+const moves1 = [...moves]
 while(true) {
-    curMoves.push(moves.shift())
+    curMoves.push(moves1.shift())
     const winner = cards.find(x => isWinningCard(x, curMoves));
     if(winner) {
         const remainingSum = winner
@@ -44,10 +45,38 @@ while(true) {
             .reduce((p,c) => p+c);
 
         const finalMove = curMoves.pop();
-        console.log('WINNER!', winner, remainingSum * finalMove);
+        console.log('WINNER!',remainingSum * finalMove);
         break;
     }
-    if(moves.length === 0) {
+    if(moves1.length === 0) {
+        console.log('FAIL')
+        break;
+    }
+}
+
+// Ex2
+let cardsInPlay = cards;
+const curMoves2 = []
+const moves2 = [...moves]
+let winner = null;
+while(true) {
+    curMoves2.push(moves2.shift())
+    cardsInPlay = cardsInPlay.filter(x => !isWinningCard(x,curMoves2));
+    if(cardsInPlay.length === 1) {
+        winner = cardsInPlay[0];
+    }
+    if(cardsInPlay.length === 0) {
+
+        const remainingSum = winner
+            .flat()
+            .filter(x => !curMoves2.includes(x))
+            .reduce((p,c) => p+c);
+
+        const finalMove = curMoves2.pop();
+        console.log('WINNER2!', remainingSum * finalMove);
+        break;
+    }
+    if(moves2.length === 0) {
         console.log('FAIL')
         break;
     }
