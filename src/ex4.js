@@ -13,12 +13,10 @@ const moves = rows
 const numRows = rows
     .map(x => x.split(/ +/).map(Number))
 
-
 function extractCards(procRows) {
     const cards = [];
     while (procRows.length > 0) {
         const workingRows = procRows.splice(0, 5);
-
         cards.push(workingRows);
     }
     return cards;
