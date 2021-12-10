@@ -2,7 +2,7 @@ const _ = require('lodash')
 
 const fs = require('fs');
 const { size } = require('lodash');
-const input = fs.readFileSync('./input/test8.txt', 'utf-8');
+const input = fs.readFileSync('./input/input8.txt', 'utf-8');
 
 const codes = input
     .split('\n')
@@ -26,34 +26,51 @@ const numCount = outputs
 console.log(numCount);
 
 const ex2 = codes.map(solveSegments)
-// solveSegments(codes[0]);
+
+console.log(ex2)
+
+const ans = ex2.reduce((x,y) => x+y)
+
+console.log(ans);
 
 function regularKeys(set) {
-    return [...set.values()].sort().join('');
-} 
+    return [...set.values()].sort();
+}
 
 function solveSegments([input, output]) {
-    const inputSets = input.map(x => new Set(x.split('')));
-    const outputSets = output.map(x => new Set(x.split('')));
+    const inputSets = input.map(x => regularKeys(new Set(x.split(''))));
+    const outputSets = output.map(x => regularKeys(new Set(x.split(''))));
     inputMap = new Map();
 
-    inputMap.set(1,inputSets.find(x => x.size === 2));
-    inputMap.set(4,inputSets.find(x => x.size === 4));
-    inputMap.set(7,inputSets.find(x => x.size === 3));
-    inputMap.set(8,inputSets.find(x => x.size === 7));
+    inputMap.set(1, inputSets.find(x => x.length === 2));
+    inputMap.set(4, inputSets.find(x => x.length === 4));
+    inputMap.set(7, inputSets.find(x => x.length === 3));
+    inputMap.set(8, inputSets.find(x => x.length === 7));
 
-    const five = inputSets.filter(x => x.size === 5);
+    const sixArr = inputSets.filter(x => x.length === 6);
+    const sevenLen = _.remove(sixArr, x => inputMap.get(1).every(y => x.includes(y)))
+    inputMap.set(6,sixArr[0])
 
-    const three = five.find(x => [...inputMap.get(1).values()].every(y => [...x.values()].includes(y)))
+    const [[nine], [zero]] = _.partition(sevenLen, x => inputMap.get(4).every(y => x.includes(y)))
+    inputMap.set(0, zero)
+    inputMap.set(9, nine)
+
+    const fiveLen = inputSets.filter(x => x.length === 5);
+
+    const [three] = _.remove(fiveLen, x => inputMap.get(1).every(y => x.includes(y)))
     inputMap.set(3, three);
 
-    const seven = inputSets.filter(x => x.size === 7);
+    const seven = inputSets.filter(x => x.length === 7);
 
-    const reversedMap = new Map([...inputMap.entries()].map(([x,y]) => [regularKeys(y),x]));
-    const ans = outputSets.map(regularKeys).map(x => reversedMap.has(x) ? reversedMap.get(x) : '?');
+    const [[five], [two]] = _.partition(fiveLen, x => x.every(y => inputMap.get(6).includes(y)))
+    inputMap.set(2, two)
+    inputMap.set(5, five)
 
-    
-    console.log(ans.join(''))
+    const reversedMap = new Map([...inputMap.entries()].map(([x, y]) => [y.join(''), x]));
+    const ans = outputSets.map(x => x.join('')).map(x => reversedMap.has(x) ? reversedMap.get(x) : '?');
+
+
+    return Number(ans.join(''));
 }
 
 // 1, 4, 7, or 8 
@@ -72,7 +89,7 @@ function solveSegments([input, output]) {
 */
 
 // 5 - 2 3 5
-// 7 - 0 6 9 
+// 6 - 0 6 9 
 
 // 0 has 6 elements ?
 // 1 has 2 elements
