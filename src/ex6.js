@@ -16,7 +16,6 @@ for(let i = 0; i < iterations; i++) {
     const next = lanternArr.shift();
     lanternArr.push(next);
     lanternArr[6] += next;
-
 }
 
 const total = lanternArr.reduce((x,y) => x+y);
