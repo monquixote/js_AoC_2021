@@ -1,7 +1,6 @@
 const _ = require('lodash')
 
 const fs = require('fs');
-const { size } = require('lodash');
 const input = fs.readFileSync('./input/input8.txt', 'utf-8');
 
 const codes = input
