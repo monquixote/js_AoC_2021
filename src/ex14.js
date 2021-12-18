@@ -52,8 +52,14 @@ const totals = new Map([
     ['N',0]
 ])
 
+let i = 0;
 function depthExpand(a, b, depth) {
     const next = rules.get(a+b);
+
+    if(i % 1000000 === 0) {
+        console.log(totals)
+    }
+    i++
 
     if(depth === 0) {
         if (totals.has(next)) {
@@ -68,7 +74,7 @@ function depthExpand(a, b, depth) {
     depthExpand(next, b, depth - 1);
 }
 
-itrEx2 = 30;
+itrEx2 = 40;
 
 depthExpand('K', 'F', itrEx2);
 

@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const fs = require('fs');
-const input = fs.readFileSync('./input/test15.txt', 'utf-8');
+const input = fs.readFileSync('./input/input15.txt', 'utf-8');
 
 const inputNums = input
     .split('\n')
@@ -40,34 +40,46 @@ const outputMap = new Map();
 
 function updateAll(distMap, costMap) {
 
-    while (distMap.size > 0) {
-        if(distMap % 100 === 0) {
+    const prospects = new Map();
+    prospects.set('0-0', 0);
+    distMap.delete('0-0');
+
+    while (prospects.size > 0) {
+        if (distMap % 100 === 0) {
             console.log(distMap.size)
         }
 
-        const [next] = _.minBy([...distMap.entries()], ([key, val]) => val);
-        updateKey(next, distMap, costMap);
-        if(next === endKey) {
+        const [next] = _.minBy([...prospects.entries()], ([key, val]) => val);
+        updateKey(next, distMap, costMap, prospects);
+        if (next === endKey) {
             return;
         }
     }
 }
 
-function updateKey(key, distMap, costMap) {
+function updateKey(key, distMap, costMap, prospects) {
 
-    const adjacentKeys = getAdjacentKeys(key)
-        .filter(adjacentKey => distMap.has(adjacentKey));
+    let adjacentKeys = getAdjacentKeys(key)
+
+    const distAdj = adjacentKeys.filter(adjacentKey => distMap.has(adjacentKey));
+
+    distAdj.forEach(k => {
+        prospects.set(k, Number.POSITIVE_INFINITY);
+        distMap.delete(k);
+    })
+
+    adjacentKeys.filter(adjacentKey => prospects.has(adjacentKey));
 
     // console.log(key, adjacentKeys);
     adjacentKeys.forEach(adjacentKey => {
-        const cost = distMap.get(key) + costMap.get(adjacentKey)
-        if (distMap.get(adjacentKey) > cost) {
-            distMap.set(adjacentKey, cost);
+        const cost = prospects.get(key) + costMap.get(adjacentKey)
+        if (prospects.get(adjacentKey) > cost) {
+            prospects.set(adjacentKey, cost);
         }
     })
 
-    outputMap.set(key, distMap.get(key));
-    distMap.delete(key);
+    outputMap.set(key, prospects.get(key));
+    prospects.delete(key);
 
     // console.log(arr2String(map2Array(outputMap)), '\n', distMap.size, adjacentKeys.length);
 }
@@ -88,7 +100,7 @@ function map2Array(m, multiplier = 1) {
 
 function arr2String(arr) {
     return arr
-        .map(x => x.map(y => (y !== undefined ? String(y) : '.').padEnd(1)).join(' '))
+        .map(x => x.map(y => (y !== undefined ? String(y) : '.').padEnd(3)).join(' '))
         .join('\n')
 }
 
@@ -98,17 +110,17 @@ function writeMap(inputMap, xFact, yFact) {
     for (let i = 0; i < inputNums.length; i++) {
         for (let j = 0; j < inputNums[i].length; j++) {
             inputMap.set(
-                `${i + (xFact*inputNums.length)}-${j + (yFact*inputNums.length)}`, 
+                `${i + (xFact * inputNums.length)}-${j + (yFact * inputNums.length)}`,
                 (inputNums[i][j] + xFact + yFact) % 9 || 9);
         }
     }
 }
 
 function expandMap(inputMap, multiplier) {
-    for(let i = 0; i < multiplier; i++) {
-        for(let j = 0; j < multiplier; j++) {
+    for (let i = 0; i < multiplier; i++) {
+        for (let j = 0; j < multiplier; j++) {
             writeMap(inputMap, i, j)
-        }    
+        }
     }
     return inputMap;
 }
@@ -123,7 +135,7 @@ for (let i = 0; i < inputNums.length; i++) {
 }
 */
 
-const expansion = 1
+const expansion = 5
 
 expandMap(costMap, expansion)
 //console.log(arr2String(map2Array(costMap, 5)))
@@ -131,7 +143,7 @@ expandMap(costMap, expansion)
 const distMap = new Map();
 
 [...costMap.keys()].forEach(x => distMap.set(x, Number.POSITIVE_INFINITY))
-console.log('len',distMap.size, costMap.size)
+console.log('len', distMap.size, costMap.size)
 
 const endKey = `${inputNums.length * expansion - 1}-${inputNums[0].length * expansion - 1}`;
 distMap.set('0-0', 0);
