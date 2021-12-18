@@ -11,7 +11,7 @@ const nodes = new Map();
 
 inputPaths.forEach((path) => {
     path.forEach(x => {
-        if(!nodes.has(x)) {
+        if (!nodes.has(x)) {
             nodes.set(x, [])
         }
     });
@@ -19,32 +19,63 @@ inputPaths.forEach((path) => {
 
     nodes.get(from).push(to);
     nodes.get(to).push(from);
-    
+
 })
 
 console.log(nodes)
 
-function canVisit(currentPath, proposed) {
-    if(proposed === proposed.toUpperCase()) {
+function canVisitOnce(currentPath, proposed) {
+    if (proposed === proposed.toUpperCase()) {
         return true;
     }
     return !currentPath.includes(proposed);
 }
 
-//Return an array of paths
-function explorePaths(currentPath, myNodes) {
-    const currentNode = currentPath[currentPath.length -1]
-    if(currentNode === 'end') {
-        return [ currentPath ];
+function canVisitTwice(currentPath, proposed) {
+    if (proposed === proposed.toUpperCase()) {
+        return true;
     }
-    const routes = myNodes
-        .get(currentNode)
-        .filter(x => canVisit(currentPath, x));  
-    // console.log('path',currentPath,'routes', routes)
+    if(proposed === 'start') {
+        return false;
+    }
+
+    if(!currentPath.includes(proposed)) {
+        return true;
+    }
+
+    const lowerOnly = currentPath
+        .filter(x => x === x.toLowerCase())
     
-    return routes.map(route => explorePaths([...currentPath,route],myNodes)).flat();
+    const uniq = _.uniq(lowerOnly);
+
+    /*
+    if(uniq.length !== lowerOnly.length) {
+        console.log('fail', currentPath, proposed)
+    }
+    */
+
+    return uniq.length === lowerOnly.length;
 }
 
-const validPaths = explorePaths(['start'],nodes);
+//Return an array of paths
+function exploreFactory(canVisit) {
+    return function explorePaths(currentPath, myNodes) {
+        const currentNode = currentPath[currentPath.length - 1]
+        if (currentNode === 'end') {
+            return [currentPath];
+        }
+        const routes = myNodes
+            .get(currentNode)
+            .filter(x => canVisit(currentPath, x));
+        // console.log('path',currentPath,'routes', routes)
 
-console.log(validPaths, validPaths.length);
+        return routes.map(route => explorePaths([...currentPath, route], myNodes)).flat();
+    }
+}
+
+const validPaths = exploreFactory(canVisitOnce)(['start'], nodes);
+
+console.log(validPaths.length);
+
+const validPaths2 = exploreFactory(canVisitTwice)(['start'], nodes);
+console.log(validPaths2.length);
