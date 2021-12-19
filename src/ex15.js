@@ -8,24 +8,6 @@ const inputNums = input
 
 const costMap = new Map();
 
-/*
-for (let i = 0; i < inputNums.length; i++) {
-    for (let j = 0; j < inputNums[i].length; j++) {
-        costMap.set(`${i}-${j}`, inputNums[i][j]);
-    }
-}
-*/
-
-/*
-const distMap = new Map();
-
-for (let i = 0; i < inputNums.length; i++) {
-    for (let j = 0; j < inputNums[i].length; j++) {
-        distMap.set(`${i}-${j}`, Number.POSITIVE_INFINITY);
-    }
-}
-*/
-
 function getAdjacentKeys(key) {
     const [x, y] = key.split('-').map(Number);
     return [
